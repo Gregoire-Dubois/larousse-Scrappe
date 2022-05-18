@@ -1,0 +1,36 @@
+import json
+from bs4 import BeautifulSoup
+import time, requests
+
+def urlCatcher():
+    # In this function, I build the urls for acces at every pages
+    url = "https://www.larousse.fr" # main url
+    url2 = "https://www.larousse.fr/index/dictionnaires/francais" #Url target for the index
+
+    page = requests.get(url2)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    box = soup.find(name="section", class_="content") # target on section name content only
+    links =[]# list for part of url
+    larousse=[]
+
+    for link in box.select(name="section", class_="content", selector='a'):# target only 'a' in section name content
+        time.sleep(5)
+        links.append(link.get('href')) #save first add of adress in list named links
+        for i in links:
+            url3=url+i
+
+        # récupération of word in target page
+        wordsPage = requests.get(url3)
+        wordSoup = BeautifulSoup(wordsPage.content, "html.parser")
+        wordsBox = wordSoup.find(name="section", class_="content olf")
+
+        words=[]
+        for word in wordsBox.select(name="section", class_="content olf", selector="a"):
+            #time.sleep(1)
+            x = word.text
+            words.append(x)
+            print(words)
+        with open("larousse5.json", "a") as f:
+            json.dump(words, f, indent=4, ensure_ascii=False)
+            
+urlCatcher()
